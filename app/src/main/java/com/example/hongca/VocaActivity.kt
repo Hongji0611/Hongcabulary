@@ -18,7 +18,6 @@ import kotlin.collections.ArrayList
 
 class VocaActivity : AppCompatActivity() {
     lateinit var binding:ActivityVocaBinding
-    lateinit var myDBHelper: MyDBHelper
 
     var data:ArrayList<MyData> = ArrayList()
     lateinit var recyclerView: RecyclerView
@@ -39,30 +38,10 @@ class VocaActivity : AppCompatActivity() {
         txt = i.getIntExtra("txt",-1)
         title = i.getStringExtra("title").toString()
         binding.title.text = title
-
-        initDB()
         init()
         initData()
         initRecyclerView()
         initTTS()
-    }
-
-    private fun initDB() {
-        val dbfile = getDatabasePath("mydb.db")
-        if(!dbfile.parentFile.exists()){
-            dbfile.parentFile.mkdir()
-        }
-        if(!dbfile.exists()){
-            val file = resources.openRawResource(R.raw.mydb)
-            val filesize = file.available()
-            val buffer = ByteArray(filesize)
-            file.read(buffer)
-            file.close()
-            dbfile.createNewFile()
-            val output = FileOutputStream(dbfile)
-            output.write(buffer)
-            output.close()
-        }
     }
 
     private fun init() {
@@ -70,6 +49,13 @@ class VocaActivity : AppCompatActivity() {
             val intent = Intent(this, AddVocActivity::class.java)
             intent.putExtra("txt", title)
             startActivityForResult(intent, ADD_VOC_REQUEST)
+        }
+
+        binding.hidemean.setOnClickListener {
+            adapter.hideMean()
+        }
+        binding.hidevoca.setOnClickListener {
+            adapter.hideword()
         }
     }
 
@@ -128,22 +114,33 @@ class VocaActivity : AppCompatActivity() {
         adapter = VocaAdapter(data)
         adapter.itemClickListener = object :VocaAdapter.OnItemClickListener{
             override fun OnItemClick(
-                holder: VocaAdapter.ViewHolder,
-                view: View,
-                data: MyData,
-                position: Int
+                    holder: VocaAdapter.ViewHolder,
+                    view: View,
+                    data: MyData,
+                    position: Int
             ) {
                 if (isTtsReady)
                     tts?.speak(data.word, TextToSpeech.QUEUE_ADD, null, null)
             }
         }
+        adapter.HeartClickListener = object :VocaAdapter.OnItemClickListener{
+            override fun OnItemClick(
+                    holder: VocaAdapter.ViewHolder,
+                    view: View,
+                    data: MyData,
+                    position: Int
+            ) {
+                adapter.changeIsOpen(position)
+            }
+        }
+
         recyclerView.adapter = adapter
         val simpleCallBack = object:
-            ItemTouchHelper.SimpleCallback(ItemTouchHelper.DOWN or ItemTouchHelper.UP, ItemTouchHelper.RIGHT){
+                ItemTouchHelper.SimpleCallback(ItemTouchHelper.DOWN or ItemTouchHelper.UP, ItemTouchHelper.RIGHT){
             override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
             ): Boolean {
                 adapter.moveItem(viewHolder.adapterPosition, target.adapterPosition)
                 return true

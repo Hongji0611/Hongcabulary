@@ -3,6 +3,7 @@ package com.example.hongca
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -13,6 +14,14 @@ class VocaAdapter (val items:ArrayList<MyData>) : RecyclerView.Adapter<VocaAdapt
     }
 
     var itemClickListener:OnItemClickListener? =null
+    var HeartClickListener:OnItemClickListener? =null
+    var wordFlag = false
+    var meanFlag = false
+
+    fun changeIsOpen(pos:Int){
+        items[pos].isOpen = !items[pos].isOpen
+        notifyDataSetChanged()
+    }
 
     fun moveItem(oldPos:Int, newPos:Int){
         val item = items[oldPos]
@@ -26,12 +35,35 @@ class VocaAdapter (val items:ArrayList<MyData>) : RecyclerView.Adapter<VocaAdapt
         notifyItemRemoved(pos)
     }
 
+    fun hideword(){
+        if(meanFlag){
+            meanFlag = false
+            wordFlag = true
+        }else{
+            wordFlag = !wordFlag
+        }
+        notifyDataSetChanged()
+    }
+    fun hideMean(){
+        if(wordFlag){
+            wordFlag = false
+            meanFlag = true
+        }else{
+            meanFlag = !meanFlag
+        }
+        notifyDataSetChanged()
+    }
+
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         val textView: TextView = itemView.findViewById(R.id.voca)
         val meaningView: TextView = itemView.findViewById(R.id.meaning)
+        val imageView:ImageView = itemView.findViewById(R.id.star)
         init{
-            itemView.setOnClickListener{
+            textView.setOnClickListener{
                 itemClickListener?.OnItemClick(this,it,items[adapterPosition],adapterPosition)
+            }
+            imageView.setOnClickListener {
+                HeartClickListener?.OnItemClick(this,it,items[adapterPosition],adapterPosition)
             }
         }
     }
@@ -48,5 +80,11 @@ class VocaAdapter (val items:ArrayList<MyData>) : RecyclerView.Adapter<VocaAdapt
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.textView.text = items[position].word
         holder.meaningView.text = items[position].meaning
+        holder.textView.isVisible = !wordFlag
+        holder.meaningView.isVisible = !meanFlag
+        if(items[position].isOpen)
+            holder.imageView.setImageResource(R.drawable.ic_baseline_favorite_24)
+        else
+            holder.imageView.setImageResource(R.drawable.ic_baseline_favorite_border_24)
     }
 }

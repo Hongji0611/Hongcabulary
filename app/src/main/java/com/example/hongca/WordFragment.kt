@@ -3,6 +3,7 @@ package com.example.hongca
 import android.content.Intent
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,19 +14,30 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.util.*
 import kotlin.collections.ArrayList
+import androidx.fragment.app.FragmentManager
 
 
 class WordFragment : Fragment() {
     private var columnCount = 2
-    var data:ArrayList<TitleData> = ArrayList()
+    var data = ArrayList<TitleData>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if(arguments!=null){
+            data = requireArguments().getSerializable("data") as ArrayList<TitleData>
+            Log.d("getData",data[0].title)
+        }
+
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_word_list, container, false)
         initData()
 
+        val view = inflater.inflate(R.layout.fragment_word_list, container, false)
         // Set the adapter
         if (view is RecyclerView) {
             with(view) {
@@ -54,9 +66,12 @@ class WordFragment : Fragment() {
         }
         return view
     }
+
     private fun initData() {
-        data.add(TitleData("즐겨 찾는 단어",R.raw.star))
-        data.add(TitleData("TOEIC",R.raw.toeic))
-        data.add(TitleData("TOEFL",R.raw.toefl))
+        data.add(TitleData("즐겨찾기",R.raw.star))
+        data.add(TitleData("토익",R.raw.toeic))
+        data.add(TitleData("토플",R.raw.toefl))
+        data.add(TitleData("나만의 단어장",0))
     }
+    
 }

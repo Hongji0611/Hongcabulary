@@ -35,6 +35,7 @@ class AddVocActivity : AppCompatActivity() {
     }
 
     private fun writeFile(word: String, meaning: String) {
+
         val output = PrintStream(openFileOutput(txt, Context.MODE_APPEND))
         output.println(word)
         output.println(meaning)
