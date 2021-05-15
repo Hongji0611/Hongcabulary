@@ -19,7 +19,10 @@ class VocaAdapter (val items:ArrayList<MyData>) : RecyclerView.Adapter<VocaAdapt
     var meanFlag = false
 
     fun changeIsOpen(pos:Int){
-        items[pos].isOpen = !items[pos].isOpen
+        if(items[pos].star == "false")
+            items[pos].star = "true"
+        else
+            items[pos].star = "false"
         notifyDataSetChanged()
     }
 
@@ -82,7 +85,7 @@ class VocaAdapter (val items:ArrayList<MyData>) : RecyclerView.Adapter<VocaAdapt
         holder.meaningView.text = items[position].meaning
         holder.textView.isVisible = !wordFlag
         holder.meaningView.isVisible = !meanFlag
-        if(items[position].isOpen)
+        if(items[position].star == "true")
             holder.imageView.setImageResource(R.drawable.ic_baseline_favorite_24)
         else
             holder.imageView.setImageResource(R.drawable.ic_baseline_favorite_border_24)

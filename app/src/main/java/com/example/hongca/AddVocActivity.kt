@@ -41,7 +41,7 @@ class AddVocActivity : AppCompatActivity() {
         output.println(meaning)
         output.close()
         val intent = Intent()
-        intent.putExtra("voc",MyData(word,meaning))
+        intent.putExtra("voc",MyData(title=txt, word = word, meaning = meaning))
         setResult(Activity.RESULT_OK, intent)
         finish()
     }

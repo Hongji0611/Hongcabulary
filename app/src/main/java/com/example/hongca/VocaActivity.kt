@@ -22,6 +22,7 @@ class VocaActivity : AppCompatActivity() {
     var data:ArrayList<MyData> = ArrayList()
     lateinit var recyclerView: RecyclerView
     lateinit var adapter: VocaAdapter
+
     var tts: TextToSpeech?= null
     var isTtsReady = false
     var txt:Int = 0
@@ -92,7 +93,7 @@ class VocaActivity : AppCompatActivity() {
         while(scan.hasNextLine()){
             val word = scan.nextLine()
             val meaning = scan.nextLine()
-            data.add(MyData(word,meaning))
+            data.add(MyData(title = title,word = word,meaning = meaning))
         }
         scan.close()
     }
