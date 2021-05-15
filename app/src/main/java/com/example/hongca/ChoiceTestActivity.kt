@@ -32,7 +32,8 @@ class ChoiceTestActivity : AppCompatActivity() {
         while(scan.hasNextLine()){
             val word = scan.nextLine()
             val meaning = scan.nextLine()
-            data.add(MyData(title = title,word = word,meaning = meaning))
+            val star = scan.nextLine()
+            data.add(MyData(word = word,meaning = meaning, star = star))
         }
         scan.close()
     }
@@ -59,10 +60,10 @@ class ChoiceTestActivity : AppCompatActivity() {
 
 
         when(title){
-            "즐겨찾기" -> initData("star", R.raw.star)
+            "즐겨찾기" -> initData("star", 0)
             "토익" -> initData("toeic",R.raw.toeic)
             "토플" -> initData("toefl",R.raw.toefl)
-            "나만의 단어장" -> initData("myown",R.raw.myown)
+            "나만의 단어장" -> initData("myown",0)
         }
 
         binding.noteTitle.text = title

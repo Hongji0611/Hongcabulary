@@ -2,6 +2,7 @@ package com.example.hongca
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.hongca.databinding.ActivityMainBinding
 import com.google.android.material.tabs.TabLayoutMediator
@@ -34,11 +35,4 @@ class MainActivity : AppCompatActivity() {
         args.putSerializable("data",data)
         wordFragment.arguments = args
     }
-
-//    //프래그먼트에 데이터 전달하기
-//    fun setDataAtFragment(fragment: Fragment){
-//        val bundle = Bundle()
-//        bundle.putSerializable("data", data)
-//        fragment.arguments = bundle
-//    }
 }

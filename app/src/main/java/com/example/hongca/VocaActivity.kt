@@ -1,18 +1,22 @@
 package com.example.hongca
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.view.View
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hongca.databinding.ActivityMainBinding
 import com.example.hongca.databinding.ActivityVocaBinding
+import java.io.File
 import java.io.FileOutputStream
+import java.io.PrintStream
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -20,6 +24,8 @@ class VocaActivity : AppCompatActivity() {
     lateinit var binding:ActivityVocaBinding
 
     var data:ArrayList<MyData> = ArrayList()
+    var stardata:ArrayList<MyData> = ArrayList()
+
     lateinit var recyclerView: RecyclerView
     lateinit var adapter: VocaAdapter
 
@@ -38,6 +44,9 @@ class VocaActivity : AppCompatActivity() {
         val i = intent
         txt = i.getIntExtra("txt",-1)
         title = i.getStringExtra("title").toString()
+
+        binding.addvoca.isVisible = !(title == "토익" || title == "토플")
+
         binding.title.text = title
         init()
         initData()
@@ -48,7 +57,7 @@ class VocaActivity : AppCompatActivity() {
     private fun init() {
         binding.addvoca.setOnClickListener {
             val intent = Intent(this, AddVocActivity::class.java)
-            intent.putExtra("txt", title)
+            intent.putExtra("title", title)
             startActivityForResult(intent, ADD_VOC_REQUEST)
         }
 
@@ -66,6 +75,7 @@ class VocaActivity : AppCompatActivity() {
             ADD_VOC_REQUEST -> {
                 if(resultCode== Activity.RESULT_OK){
                     val str = data?.getSerializableExtra("voc") as MyData
+                    adapter.addData(str)
                     Toast.makeText(this, str.word+" 단어 추가완료 :)",Toast.LENGTH_SHORT).show()
                 }
             }
@@ -84,6 +94,33 @@ class VocaActivity : AppCompatActivity() {
         tts?.stop()
     }
 
+    fun saveData(){
+        var temp = ""
+        if(title == "토익" || title == "토플"){
+            temp = resources.openRawResource(txt).toString()
+        }else{
+            temp = "$title.txt"
+        }
+        val output = PrintStream(this?.openFileOutput(temp, Context.MODE_PRIVATE))
+        for(i in 0 until data.size){
+            output.println(data[i].word)
+            output.println(data[i].meaning)
+            output.println(data[i].star)
+        }
+        output.close()
+    }
+
+    fun saveStar(){
+        val temp = "즐겨찾기.txt"
+        val output = PrintStream(this?.openFileOutput(temp, Context.MODE_APPEND))
+        for(i in 0 until stardata.size){
+            output.println(stardata[i].word)
+            output.println(stardata[i].meaning)
+            output.println("true")
+        }
+        output.close()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         tts?.shutdown()
@@ -93,26 +130,30 @@ class VocaActivity : AppCompatActivity() {
         while(scan.hasNextLine()){
             val word = scan.nextLine()
             val meaning = scan.nextLine()
-            data.add(MyData(title = title,word = word,meaning = meaning))
+            val star = scan.nextLine()
+            data.add(MyData(word = word,meaning = meaning, star = star))
         }
         scan.close()
     }
 
     private fun initData() {
-        val temp = "$title.txt"
-        try {
-            val scan2 = Scanner(openFileInput(temp))
-            readFileScan(scan2)
-        }catch (e:Exception){
+        if(title == "토익" || title == "토플") {
+            val scan = Scanner(resources.openRawResource(txt))
+            readFileScan(scan)
+        }else{
+            val temp = "$title.txt"
+            try {
+                val scan2 = Scanner(openFileInput(temp))
+                readFileScan(scan2)
+            }catch (e:Exception){
+            }
         }
-        val scan = Scanner(resources.openRawResource(txt))
-        readFileScan(scan)
     }
 
     private fun initRecyclerView() {
         recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false)
-        adapter = VocaAdapter(data)
+        adapter = VocaAdapter(data, stardata)
         adapter.itemClickListener = object :VocaAdapter.OnItemClickListener{
             override fun OnItemClick(
                     holder: VocaAdapter.ViewHolder,
@@ -132,6 +173,8 @@ class VocaActivity : AppCompatActivity() {
                     position: Int
             ) {
                 adapter.changeIsOpen(position)
+                saveStar()
+                saveData()
             }
         }
 
@@ -149,6 +192,7 @@ class VocaActivity : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 adapter.removeItem(viewHolder.adapterPosition)
+                saveData()
             }
 
         }

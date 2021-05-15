@@ -20,7 +20,7 @@ class AddVocActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val i = intent
-        val title = i.getStringExtra("txt").toString()
+        val title = i.getStringExtra("title").toString()
         txt = "$title.txt"
 
         init()
@@ -35,13 +35,12 @@ class AddVocActivity : AppCompatActivity() {
     }
 
     private fun writeFile(word: String, meaning: String) {
-
         val output = PrintStream(openFileOutput(txt, Context.MODE_APPEND))
         output.println(word)
         output.println(meaning)
         output.close()
         val intent = Intent()
-        intent.putExtra("voc",MyData(title=txt, word = word, meaning = meaning))
+        intent.putExtra("voc",MyData(word = word, meaning = meaning, star = "false"))
         setResult(Activity.RESULT_OK, intent)
         finish()
     }

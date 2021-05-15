@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 
-class VocaAdapter (val items:ArrayList<MyData>) : RecyclerView.Adapter<VocaAdapter.ViewHolder>(){
+class VocaAdapter (val items:ArrayList<MyData>, val staritems:ArrayList<MyData>) : RecyclerView.Adapter<VocaAdapter.ViewHolder>(){
     interface OnItemClickListener{
         fun OnItemClick(holder:ViewHolder, view: View, data:MyData, position:Int)
     }
@@ -19,10 +19,13 @@ class VocaAdapter (val items:ArrayList<MyData>) : RecyclerView.Adapter<VocaAdapt
     var meanFlag = false
 
     fun changeIsOpen(pos:Int){
-        if(items[pos].star == "false")
+        if(items[pos].star == "false"){
             items[pos].star = "true"
-        else
+            staritems.add(items[pos])
+        }else{
             items[pos].star = "false"
+            staritems.remove(items[pos])
+        }
         notifyDataSetChanged()
     }
 
@@ -36,6 +39,10 @@ class VocaAdapter (val items:ArrayList<MyData>) : RecyclerView.Adapter<VocaAdapt
     fun removeItem(pos:Int){
         items.removeAt(pos)
         notifyItemRemoved(pos)
+    }
+    fun addData(data:MyData){
+        items.add(data)
+        notifyDataSetChanged()
     }
 
     fun hideword(){

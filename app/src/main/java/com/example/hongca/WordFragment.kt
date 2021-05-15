@@ -68,10 +68,11 @@ class WordFragment : Fragment() {
     }
 
     private fun initData() {
-        data.add(TitleData("즐겨찾기",R.raw.star))
+        data.add(TitleData("즐겨찾기",0))
         data.add(TitleData("토익",R.raw.toeic))
         data.add(TitleData("토플",R.raw.toefl))
         data.add(TitleData("나만의 단어장",0))
+        data.add(TitleData("오답노트",0))
     }
     
 }
