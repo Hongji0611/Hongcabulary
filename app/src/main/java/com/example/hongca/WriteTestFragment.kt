@@ -20,10 +20,11 @@ class WriteTestFragment(val type:Int, val data:MyData, val str:List<String>, val
     var tts: TextToSpeech?= null
     var isTtsReady = false
 
-    fun addWord() {
-        val output = PrintStream(context?.openFileOutput("incorrect.txt", Context.MODE_APPEND))
+    fun addWord(){
+        val output = PrintStream(context?.openFileOutput("오답노트.txt", Context.MODE_APPEND))
         output.println(data.word)
         output.println(data.meaning)
+        output.println("false")
         output.close()
     }
 
@@ -79,6 +80,7 @@ class WriteTestFragment(val type:Int, val data:MyData, val str:List<String>, val
                         Toast.makeText(activity, "틀렸습니다! 정답은 '${data.word}' 입니다.", Toast.LENGTH_SHORT)
                             .show()
                     }
+                    addWord()
                 }
             }
 

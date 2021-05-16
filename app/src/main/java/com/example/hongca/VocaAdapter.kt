@@ -18,13 +18,15 @@ class VocaAdapter (val items:ArrayList<MyData>, val staritems:ArrayList<MyData>)
     var wordFlag = false
     var meanFlag = false
 
-    fun changeIsOpen(pos:Int){
+    fun changeIsOpen(pos:Int, flag:Boolean){
         if(items[pos].star == "false"){
             items[pos].star = "true"
             staritems.add(items[pos])
         }else{
-            items[pos].star = "false"
-            staritems.remove(items[pos])
+            if(!flag){
+                items[pos].star = "false"
+                staritems.remove(items[pos])
+            }
         }
         notifyDataSetChanged()
     }

@@ -7,10 +7,21 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:srcCompat="@drawable/logo2" />
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tablayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:tabIconTint="@color/black"
+        app:tabIndicatorColor="@color/yellow"
+        app:tabSelectedTextColor="@color/pink"
+        app:tabTextColor="#000000">
 
     </com.google.android.material.tabs.TabLayout>
 

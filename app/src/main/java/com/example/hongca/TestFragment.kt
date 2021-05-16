@@ -35,7 +35,6 @@ class TestFragment : Fragment() {
 
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                     title = parent?.getItemAtPosition(position).toString()
-                    Toast.makeText(activity, "title $title",Toast.LENGTH_SHORT).show()
                 }
             }
             spinner2.onItemSelectedListener = object :AdapterView.OnItemSelectedListener{

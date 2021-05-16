@@ -25,9 +25,10 @@ class ChoiceTestFragment(val type:Int, val data:ArrayList<MyData>, val ok:Int, v
     var isTtsReady = false
 
     fun addWord(){
-        val output = PrintStream(context?.openFileOutput("incorrect.txt", Context.MODE_APPEND))
+        val output = PrintStream(context?.openFileOutput("오답노트.txt", Context.MODE_APPEND))
         output.println(data[0].word)
         output.println(data[0].meaning)
+        output.println("false")
         output.close()
     }
     fun correct(){

@@ -1,11 +1,14 @@
 package com.example.hongca
 
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.PorterDuff
 import android.os.Bundle
-import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.hongca.databinding.ActivityMainBinding
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
+
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
@@ -29,6 +32,27 @@ class MainActivity : AppCompatActivity() {
             tab.text = textarr[position]
             tab.setIcon(iconarr[position])
         }.attach()
+        val selected = ContextCompat.getColor(this, R.color.pink)
+        val unselected = ContextCompat.getColor(this, R.color.black)
+
+        binding.tablayout.getTabAt(0)?.getIcon()?.setColorFilter(selected, PorterDuff.Mode.SRC_IN)
+        binding.tablayout.setOnTabSelectedListener(object : OnTabSelectedListener {
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                val position = tab?.position
+                if (position != null) {
+                    binding.tablayout.getTabAt(position)?.getIcon()?.setColorFilter(unselected, PorterDuff.Mode.SRC_IN)
+                }
+            }
+
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                val position = tab.position
+                binding.tablayout.getTabAt(position)?.getIcon()?.setColorFilter(selected, PorterDuff.Mode.SRC_IN)
+            }
+        })
 
         val wordFragment = WordFragment()
         var args = Bundle()

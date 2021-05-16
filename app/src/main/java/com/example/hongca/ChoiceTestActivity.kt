@@ -2,12 +2,9 @@ package com.example.hongca
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.TextView
+import android.util.Log
+import android.widget.Toast
 import com.example.hongca.databinding.ActivityChoiceTestBinding
-import com.example.hongca.databinding.ActivityMainBinding
-import com.google.android.material.tabs.TabLayoutMediator
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -38,15 +35,18 @@ class ChoiceTestActivity : AppCompatActivity() {
         scan.close()
     }
 
-    private fun initData(title : String, rawsourse:Int) {
-        val temp = "$title.txt"
-        try {
-            val scan2 = Scanner(openFileInput(temp))
-            readFileScan(scan2)
-        }catch (e:Exception){
+    private fun initData(title: String, rawsourse: Int) {
+        if(rawsourse != 0) {
+            val scan = Scanner(resources.openRawResource(rawsourse))
+            readFileScan(scan)
+        }else{
+            val temp = "$title.txt"
+            try {
+                val scan2 = Scanner(openFileInput(temp))
+                readFileScan(scan2)
+            }catch (e:Exception){
+            }
         }
-        val scan = Scanner(resources.openRawResource(rawsourse))
-        readFileScan(scan)
     }
 
     private fun init() {
@@ -60,12 +60,12 @@ class ChoiceTestActivity : AppCompatActivity() {
 
 
         when(title){
-            "즐겨찾기" -> initData("star", 0)
+            "즐겨찾기" -> initData("즐겨찾기", 0)
             "토익" -> initData("toeic",R.raw.toeic)
             "토플" -> initData("toefl",R.raw.toefl)
-            "나만의 단어장" -> initData("myown",0)
+            "나만의 단어장" -> initData("나만의 단어장",0)
+            "오답노트" -> initData("오답노트",0)
         }
-
         binding.noteTitle.text = title
         binding.count.text = "$count 개"
         if(type == 0){
@@ -73,29 +73,34 @@ class ChoiceTestActivity : AppCompatActivity() {
         }else{
             binding.type.text = "영어 맞추기"
         }
-        //정답 자리 랜덤으로 선택
-        val random = Random()
-        val okList =ArrayList<Int>(count)
-        for (i in 0 until count){
-            okList.add(random.nextInt(4)+1)
-        }
 
-        for(i in 0 until count){
-            //문제 하나 당, 중복 없이 랜덤 숫자 생성
-            val numlist = ArrayList<Int>()
-            while(numlist.size<4){
-                val num = random.nextInt(data.size)
-                if(numlist.contains(num)) continue
-                numlist.add(num)
+        if(data.size < 4 ){
+            Toast.makeText(this, "단어장의 단어 개수가 적습니다. 더 추가해주세요 :)",Toast.LENGTH_LONG).show()
+            binding.viewPager.adapter = ChoiceFragAdapter(this, viewList)
+        }else{
+            //정답 자리 랜덤으로 선택
+            val random = Random()
+            val okList =ArrayList<Int>(count)
+            for (i in 0 until count){
+                okList.add(random.nextInt(4)+1)
             }
-            val temp = ArrayList<MyData>()
-            for(j in 0 until 4){
-                temp.add(data[numlist[j]])
-            }
-            val frag = ChoiceTestFragment(type, temp, okList[i], i, count-1, testName)
-            viewList.add(frag)
-        }
 
-        binding.viewPager.adapter = ChoiceFragAdapter(this, viewList)
+            for(i in 0 until count){
+                //문제 하나 당, 중복 없이 랜덤 숫자 생성
+                val numlist = ArrayList<Int>()
+                while(numlist.size<4){
+                    val num = random.nextInt(data.size)
+                    if(numlist.contains(num)) continue
+                    numlist.add(num)
+                }
+                val temp = ArrayList<MyData>()
+                for(j in 0 until 4){
+                    temp.add(data[numlist[j]])
+                }
+                val frag = ChoiceTestFragment(type, temp, okList[i], i, count-1, testName)
+                viewList.add(frag)
+            }
+            binding.viewPager.adapter = ChoiceFragAdapter(this, viewList)
+        }
     }
 }

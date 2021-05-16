@@ -5,6 +5,7 @@
         <item>토익</item>
         <item>토플</item>
         <item>나만의 단어장</item>
+        <item>오답노트</item>
     </string-array>
     <string-array name="count">
         <item>5</item>

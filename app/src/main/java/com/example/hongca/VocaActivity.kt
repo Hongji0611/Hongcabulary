@@ -3,20 +3,18 @@ package com.example.hongca
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.hongca.databinding.ActivityMainBinding
 import com.example.hongca.databinding.ActivityVocaBinding
-import java.io.File
-import java.io.FileOutputStream
-import java.io.PrintStream
+import java.io.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -97,22 +95,24 @@ class VocaActivity : AppCompatActivity() {
     fun saveData(){
         var temp = ""
         if(title == "토익" || title == "토플"){
-            temp = resources.openRawResource(txt).toString()
+
         }else{
             temp = "$title.txt"
+            val output = PrintStream(this?.openFileOutput(temp, Context.MODE_PRIVATE))
+            for(i in 0 until data.size){
+                output.println(data[i].word)
+                output.println(data[i].meaning)
+                output.println(data[i].star)
+            }
+            output.close()
         }
-        val output = PrintStream(this?.openFileOutput(temp, Context.MODE_PRIVATE))
-        for(i in 0 until data.size){
-            output.println(data[i].word)
-            output.println(data[i].meaning)
-            output.println(data[i].star)
-        }
-        output.close()
+
+
     }
 
     fun saveStar(){
         val temp = "즐겨찾기.txt"
-        val output = PrintStream(this?.openFileOutput(temp, Context.MODE_APPEND))
+        val output = PrintStream(this?.openFileOutput(temp, Context.MODE_PRIVATE))
         for(i in 0 until stardata.size){
             output.println(stardata[i].word)
             output.println(stardata[i].meaning)
@@ -126,7 +126,7 @@ class VocaActivity : AppCompatActivity() {
         tts?.shutdown()
     }
 
-    fun readFileScan(scan:Scanner){
+    fun readFileScan(scan:Scanner , data:ArrayList<MyData>){
         while(scan.hasNextLine()){
             val word = scan.nextLine()
             val meaning = scan.nextLine()
@@ -139,15 +139,20 @@ class VocaActivity : AppCompatActivity() {
     private fun initData() {
         if(title == "토익" || title == "토플") {
             val scan = Scanner(resources.openRawResource(txt))
-            readFileScan(scan)
+            readFileScan(scan,data)
         }else{
             val temp = "$title.txt"
             try {
                 val scan2 = Scanner(openFileInput(temp))
-                readFileScan(scan2)
+                readFileScan(scan2,data)
             }catch (e:Exception){
             }
         }
+        try{
+            val scan3 = Scanner(openFileInput("즐겨찾기.txt"))
+            readFileScan(scan3,stardata)
+        }catch (e:Exception){}
+
     }
 
     private fun initRecyclerView() {
@@ -172,7 +177,11 @@ class VocaActivity : AppCompatActivity() {
                     data: MyData,
                     position: Int
             ) {
-                adapter.changeIsOpen(position)
+                var flag = false
+                if(title == "토익" || title == "토플") {
+                    flag = true
+                }
+                adapter.changeIsOpen(position, flag)
                 saveStar()
                 saveData()
             }

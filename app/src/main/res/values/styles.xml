@@ -5,8 +5,16 @@
         <item name="colorPrimaryDark">@android:color/background_light</item>
         <item name="colorAccent">@android:color/background_light</item>
     </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorPrimary">@color/pink</item>
+        <item name="colorOnPrimary">@color/pink</item>
+    </style>
+
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimaryDark">@color/pink</item>
-        <item name="colorPrimary">@color/white</item>
+
     </style>
 </resources>

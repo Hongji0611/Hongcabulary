@@ -2,7 +2,6 @@ package com.example.hongca
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.hongca.databinding.ActivityChoiceTestBinding
 import com.example.hongca.databinding.ActivityWriteTestBinding
 import java.util.*
 import kotlin.collections.ArrayList
@@ -34,15 +33,18 @@ class WriteTestActivity : AppCompatActivity() {
         scan.close()
     }
 
-    private fun initData(title : String, rawsourse:Int) {
-        val temp = "$title.txt"
-        try {
-            val scan2 = Scanner(openFileInput(temp))
-            readFileScan(scan2)
-        }catch (e:Exception){
+    private fun initData(title: String, rawsourse: Int) {
+        if(rawsourse != 0) {
+            val scan = Scanner(resources.openRawResource(rawsourse))
+            readFileScan(scan)
+        }else{
+            val temp = "$title.txt"
+            try {
+                val scan2 = Scanner(openFileInput(temp))
+                readFileScan(scan2)
+            }catch (e:Exception){
+            }
         }
-        val scan = Scanner(resources.openRawResource(rawsourse))
-        readFileScan(scan)
     }
 
     private fun init() {
@@ -55,10 +57,11 @@ class WriteTestActivity : AppCompatActivity() {
         binding.title.text = testName
 
         when(title){
-            "즐겨찾기" -> initData("star", 0)
+            "즐겨찾기" -> initData("즐겨찾기", 0)
             "토익" -> initData("toeic",R.raw.toeic)
             "토플" -> initData("toefl",R.raw.toefl)
-            "나만의 단어장" -> initData("myown", 0)
+            "나만의 단어장" -> initData("나만의 단어장",0)
+            "오답노트" -> initData("오답노트",0)
         }
 
         binding.noteTitle.text = title
@@ -69,7 +72,11 @@ class WriteTestActivity : AppCompatActivity() {
             binding.type.text = "영어 맞추기"
         }
 
-        //정답 자리 랜덤으로 선택
+        if(data.size < count){
+            count = data.size
+        }
+
+        //중복되지 않게 단어를 뽑음
         val random = Random()
         val numList =ArrayList<Int>(count)
         while(numList.size<count){
