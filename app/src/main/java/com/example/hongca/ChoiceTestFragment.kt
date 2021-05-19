@@ -14,6 +14,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.example.hongca.databinding.FragmentChoiceTestBinding
 import com.example.hongca.databinding.FragmentTestBinding
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import java.io.PrintStream
 import java.util.*
 import kotlin.collections.ArrayList
@@ -24,13 +26,12 @@ class ChoiceTestFragment(val type:Int, val data:ArrayList<MyData>, val ok:Int, v
     var tts: TextToSpeech?= null
     var isTtsReady = false
 
+    lateinit var rdb: DatabaseReference //오답노트 단어장
+
     fun addWord(){
-        val output = PrintStream(context?.openFileOutput("오답노트.txt", Context.MODE_APPEND))
-        output.println(data[0].word)
-        output.println(data[0].meaning)
-        output.println("false")
-        output.close()
+        rdb.child(data[0].word).setValue(data[0])
     }
+
     fun correct(){
         when(ok){
             1-> binding?.answer1?.setBackgroundResource(R.drawable.pink_fill)
@@ -44,6 +45,8 @@ class ChoiceTestFragment(val type:Int, val data:ArrayList<MyData>, val ok:Int, v
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        rdb = FirebaseDatabase.getInstance().getReference("MyApp/Note/오답노트")
+
         binding = FragmentChoiceTestBinding.inflate(layoutInflater, container, false)
         binding!!.apply {
             initTTS()

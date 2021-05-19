@@ -7,45 +7,24 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.example.hongca.databinding.Row2Binding
+import com.example.hongca.databinding.RowBinding
+import com.firebase.ui.database.FirebaseRecyclerAdapter
+import com.firebase.ui.database.FirebaseRecyclerOptions
 
-class VocaAdapter (val items:ArrayList<MyData>, val staritems:ArrayList<MyData>) : RecyclerView.Adapter<VocaAdapter.ViewHolder>(){
+class VocaAdapter (options : FirebaseRecyclerOptions<MyData>)
+    : FirebaseRecyclerAdapter<MyData, VocaAdapter.ViewHolder>(options) {
+
     interface OnItemClickListener{
-        fun OnItemClick(holder:ViewHolder, view: View, data:MyData, position:Int)
+        fun OnItemClick(view:View, position:Int)
     }
 
     var itemClickListener:OnItemClickListener? =null
     var HeartClickListener:OnItemClickListener? =null
+
     var wordFlag = false
     var meanFlag = false
 
-    fun changeIsOpen(pos:Int, flag:Boolean){
-        if(items[pos].star == "false"){
-            items[pos].star = "true"
-            staritems.add(items[pos])
-        }else{
-            if(!flag){
-                items[pos].star = "false"
-                staritems.remove(items[pos])
-            }
-        }
-        notifyDataSetChanged()
-    }
-
-    fun moveItem(oldPos:Int, newPos:Int){
-        val item = items[oldPos]
-        items.removeAt(oldPos)
-        items.add(newPos, item)
-        notifyItemMoved(oldPos,newPos)
-    }
-
-    fun removeItem(pos:Int){
-        items.removeAt(pos)
-        notifyItemRemoved(pos)
-    }
-    fun addData(data:MyData){
-        items.add(data)
-        notifyDataSetChanged()
-    }
 
     fun hideword(){
         if(meanFlag){
@@ -66,37 +45,35 @@ class VocaAdapter (val items:ArrayList<MyData>, val staritems:ArrayList<MyData>)
         notifyDataSetChanged()
     }
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
-        val textView: TextView = itemView.findViewById(R.id.voca)
-        val meaningView: TextView = itemView.findViewById(R.id.meaning)
-        val imageView:ImageView = itemView.findViewById(R.id.star)
+    inner class ViewHolder(val binding: RowBinding) : RecyclerView.ViewHolder(binding.root){
         init{
-            textView.setOnClickListener{
-                itemClickListener?.OnItemClick(this,it,items[adapterPosition],adapterPosition)
-            }
-            imageView.setOnClickListener {
-                HeartClickListener?.OnItemClick(this,it,items[adapterPosition],adapterPosition)
+            binding.apply {
+                voca.setOnClickListener {
+                    itemClickListener?.OnItemClick(it, adapterPosition)
+                }
+                star.setOnClickListener {
+                    HeartClickListener?.OnItemClick(it, adapterPosition)
+                }
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.row, parent, false)
+        val view = RowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(view)
     }
 
-    override fun getItemCount(): Int {
-        return items.size
-    }
+    override fun onBindViewHolder(holder: VocaAdapter.ViewHolder, position: Int, model: MyData) {
+        holder.binding.apply {
+            voca.text = model.word
+            meaning.text = model.meaning
+            voca.isVisible = !wordFlag
+            meaning.isVisible = !meanFlag
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.textView.text = items[position].word
-        holder.meaningView.text = items[position].meaning
-        holder.textView.isVisible = !wordFlag
-        holder.meaningView.isVisible = !meanFlag
-        if(items[position].star == "true")
-            holder.imageView.setImageResource(R.drawable.ic_baseline_favorite_24)
-        else
-            holder.imageView.setImageResource(R.drawable.ic_baseline_favorite_border_24)
+            if(model.star == "true")
+                star.setImageResource(R.drawable.ic_baseline_favorite_24)
+            else
+                star.setImageResource(R.drawable.ic_baseline_favorite_border_24)
+        }
     }
 }

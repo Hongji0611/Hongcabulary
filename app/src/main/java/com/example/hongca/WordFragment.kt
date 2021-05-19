@@ -10,65 +10,67 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.hongca.databinding.FragmentWordBinding
+import com.example.hongca.databinding.FragmentWriteTestBinding
+import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import kotlin.collections.ArrayList
 
 
 class WordFragment : Fragment() {
-    private var columnCount = 2
-    var data = ArrayList<TitleData>()
+    var data = ArrayList<String>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if(arguments!=null){
-            data = requireArguments().getSerializable("data") as ArrayList<TitleData>
-            Log.d("getData",data[0].title)
-        }
+    var binding: FragmentWordBinding? = null
+    lateinit var rdb: DatabaseReference
+    lateinit var layoutManager: GridLayoutManager
+    lateinit var adapter: WordAdapter
 
+    override fun onDestroy() {
+        super.onDestroy()
+        adapter.stopListening()
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        initData()
+        binding = FragmentWordBinding.inflate(layoutInflater, container, false)
+        layoutManager = GridLayoutManager(activity, 2)
 
-        val view = inflater.inflate(R.layout.fragment_word_list, container, false)
-        // Set the adapter
-        if (view is RecyclerView) {
-            with(view) {
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
-                adapter = WordAdapter(data)
-                (adapter as WordAdapter).itemClickListener = object :WordAdapter.OnItemClickListener{
-                    override fun OnItemClick(
-                        holder: WordAdapter.ViewHolder,
-                        view: View,
-                        data: TitleData,
-                        position: Int
-                    ) {
-                        val intent = Intent(activity, VocaActivity::class.java)
-                        intent.putExtra("txt", data.txt)
-                        intent.putExtra("title", data.title)
-                        startActivity(intent)
+        //데이터베이스 접근
+        rdb = FirebaseDatabase.getInstance().getReference("MyApp/NoteName")
+        val query = rdb.limitToLast(50)
+        val option = FirebaseRecyclerOptions.Builder<String>()
+            .setQuery(query, String::class.java)
+            .build()
 
-                    }
-
-                }
-
+        //어뎁터 설정
+        adapter = WordAdapter(option)
+        adapter.startListening()
+        adapter.notifyDataSetChanged()
+        adapter.itemClickListener = object :WordAdapter.OnItemClickListener{
+            override fun OnItemClick(view: View, position: Int) {
+                val intent = Intent(activity, VocaActivity::class.java)
+                intent.putExtra("noteTitle", adapter.getItem(position))
+                startActivity(intent)
             }
+
         }
-        return view
+
+        //리사이클러뷰 설정
+        binding?.apply {
+            recyclerView.layoutManager = layoutManager
+            recyclerView.adapter = adapter
+            addNote.setOnClickListener {
+//                val intent = Intent(activity, VocaActivity::class.java)
+//                intent.putExtra("noteTitle", "즐겨찾기")
+//                startActivity(intent)
+            }
+
+        }
+
+        return binding!!.root
     }
 
-    private fun initData() {
-        data.add(TitleData("즐겨찾기",0))
-        data.add(TitleData("토익",R.raw.toeic))
-        data.add(TitleData("토플",R.raw.toefl))
-        data.add(TitleData("나만의 단어장",0))
-        data.add(TitleData("오답노트",0))
-    }
-    
 }

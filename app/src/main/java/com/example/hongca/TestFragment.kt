@@ -77,9 +77,6 @@ class TestFragment : Fragment() {
                 intent.putExtra("testName", "주관식 퀴즈")
                 startActivity(intent)
             }
-            IncorrectNote.setOnClickListener {
-
-            }
             listening.setOnClickListener {
                 val intent = Intent(activity, ChoiceTestActivity::class.java)
                 intent.putExtra("title", title)

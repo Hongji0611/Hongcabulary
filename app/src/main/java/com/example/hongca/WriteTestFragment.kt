@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.example.hongca.databinding.FragmentChoiceTestBinding
 import com.example.hongca.databinding.FragmentWriteTestBinding
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import java.io.PrintStream
 import java.util.*
 
@@ -20,18 +22,18 @@ class WriteTestFragment(val type:Int, val data:MyData, val str:List<String>, val
     var tts: TextToSpeech?= null
     var isTtsReady = false
 
+    lateinit var rdb: DatabaseReference //오답노트 단어장
+
     fun addWord(){
-        val output = PrintStream(context?.openFileOutput("오답노트.txt", Context.MODE_APPEND))
-        output.println(data.word)
-        output.println(data.meaning)
-        output.println("false")
-        output.close()
+        rdb.child(data.word).setValue(data)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        rdb = FirebaseDatabase.getInstance().getReference("MyApp/Note/오답노트")
+
         binding = FragmentWriteTestBinding.inflate(layoutInflater, container, false)
         binding!!.apply {
             initTTS()

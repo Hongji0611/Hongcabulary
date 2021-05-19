@@ -14,6 +14,9 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hongca.databinding.ActivityVocaBinding
+import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import java.io.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -21,18 +24,18 @@ import kotlin.collections.ArrayList
 class VocaActivity : AppCompatActivity() {
     lateinit var binding:ActivityVocaBinding
 
-    var data:ArrayList<MyData> = ArrayList()
-    var stardata:ArrayList<MyData> = ArrayList()
-
-    lateinit var recyclerView: RecyclerView
     lateinit var adapter: VocaAdapter
+    lateinit var layoutManager: LinearLayoutManager
 
     var tts: TextToSpeech?= null
     var isTtsReady = false
-    var txt:Int = 0
-    var title:String =""
 
+    var noteTitle:String =""
     val ADD_VOC_REQUEST = 100
+
+    lateinit var rdb: DatabaseReference
+    lateinit var rdb2: DatabaseReference
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,31 +43,97 @@ class VocaActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val i = intent
-        txt = i.getIntExtra("txt",-1)
-        title = i.getStringExtra("title").toString()
+        noteTitle = i.getStringExtra("noteTitle").toString()
 
-        binding.addvoca.isVisible = !(title == "토익" || title == "토플")
-
-        binding.title.text = title
+        binding.title.text = noteTitle
         init()
-        initData()
-        initRecyclerView()
         initTTS()
     }
 
     private fun init() {
+        layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+
+        //데이터베이스 접근
+        rdb = FirebaseDatabase.getInstance().getReference("MyApp/Note/${noteTitle}")
+        val query = rdb.limitToLast(50)
+        val option = FirebaseRecyclerOptions.Builder<MyData>()
+            .setQuery(query, MyData::class.java)
+            .build()
+
+        rdb2 = FirebaseDatabase.getInstance().getReference("MyApp/Note/즐겨찾기")
+
+        //어뎁터 설정
+        adapter = VocaAdapter(option)
+        adapter.itemClickListener = object :VocaAdapter.OnItemClickListener{
+            override fun OnItemClick(view: View, position: Int) {
+                if (isTtsReady)
+                    tts?.speak(adapter.getItem(position).word, TextToSpeech.QUEUE_ADD, null, null)
+            }
+        }
+
+        adapter.HeartClickListener = object :VocaAdapter.OnItemClickListener{
+            override fun OnItemClick(view: View, position: Int) {
+                var temp = adapter.getItem(position)
+                if(temp.star == "true"){ //즐겨찾기 해제
+                    if(noteTitle == "즐겨찾기" || noteTitle == "오답노트"){
+                        val rdb3 = FirebaseDatabase.getInstance().getReference("MyApp/Note/${temp.noteTitle}")
+                        rdb3.child(temp.word)
+                                .child("star") //일부 속성 바꾸기
+                                .setValue("false")
+                    }else{
+                        rdb.child(temp.word)
+                                .child("star") //일부 속성 바꾸기
+                                .setValue("false")
+                    }
+                    temp.star = "false"
+                    rdb2.child(temp.word).removeValue()
+                }else{ //즐겨찾기 추가
+                    rdb.child(temp.word)
+                            .child("star") //일부 속성 바꾸기
+                            .setValue("true")
+                    temp.star = "true"
+                    rdb2.child(temp.word).setValue(temp)
+                }
+            }
+        }
+
+        //리사이클러뷰와 각 버튼 설정
+        binding.apply {
+            recyclerView.layoutManager = layoutManager
+            recyclerView.adapter = adapter
+            hidemean.setOnClickListener {
+                adapter.hideMean()
+            }
+            hidevoca.setOnClickListener {
+                adapter.hideword()
+            }
+        }
+
         binding.addvoca.setOnClickListener {
             val intent = Intent(this, AddVocActivity::class.java)
-            intent.putExtra("title", title)
+            intent.putExtra("noteTitle", noteTitle)
             startActivityForResult(intent, ADD_VOC_REQUEST)
         }
 
-        binding.hidemean.setOnClickListener {
-            adapter.hideMean()
+        if(noteTitle != "즐겨찾기"){
+            val simpleCallBack = object:
+                    ItemTouchHelper.SimpleCallback(ItemTouchHelper.DOWN or ItemTouchHelper.UP, ItemTouchHelper.RIGHT){
+                override fun onMove(
+                        recyclerView: RecyclerView,
+                        viewHolder: RecyclerView.ViewHolder,
+                        target: RecyclerView.ViewHolder
+                ): Boolean {
+                    return true
+                }
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) { //데이터 삭제
+                    rdb.child(adapter.getItem(viewHolder.adapterPosition).word).removeValue()
+                }
+            }
+            val itemTouchHelper = ItemTouchHelper(simpleCallBack)
+            itemTouchHelper.attachToRecyclerView(binding.recyclerView)
         }
-        binding.hidevoca.setOnClickListener {
-            adapter.hideword()
-        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -73,7 +142,6 @@ class VocaActivity : AppCompatActivity() {
             ADD_VOC_REQUEST -> {
                 if(resultCode== Activity.RESULT_OK){
                     val str = data?.getSerializableExtra("voc") as MyData
-                    adapter.addData(str)
                     Toast.makeText(this, str.word+" 단어 추가완료 :)",Toast.LENGTH_SHORT).show()
                 }
             }
@@ -87,126 +155,20 @@ class VocaActivity : AppCompatActivity() {
         })
     }
 
+    override fun onStart() {
+        super.onStart()
+        adapter.startListening()
+    }
+
     override fun onStop() {
         super.onStop()
         tts?.stop()
-    }
-
-    fun saveData(){
-        var temp = ""
-        if(title == "토익" || title == "토플"){
-
-        }else{
-            temp = "$title.txt"
-            val output = PrintStream(this?.openFileOutput(temp, Context.MODE_PRIVATE))
-            for(i in 0 until data.size){
-                output.println(data[i].word)
-                output.println(data[i].meaning)
-                output.println(data[i].star)
-            }
-            output.close()
-        }
-
-
-    }
-
-    fun saveStar(){
-        val temp = "즐겨찾기.txt"
-        val output = PrintStream(this?.openFileOutput(temp, Context.MODE_PRIVATE))
-        for(i in 0 until stardata.size){
-            output.println(stardata[i].word)
-            output.println(stardata[i].meaning)
-            output.println("true")
-        }
-        output.close()
+        adapter.stopListening()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         tts?.shutdown()
-    }
-
-    fun readFileScan(scan:Scanner , data:ArrayList<MyData>){
-        while(scan.hasNextLine()){
-            val word = scan.nextLine()
-            val meaning = scan.nextLine()
-            val star = scan.nextLine()
-            data.add(MyData(word = word,meaning = meaning, star = star))
-        }
-        scan.close()
-    }
-
-    private fun initData() {
-        if(title == "토익" || title == "토플") {
-            val scan = Scanner(resources.openRawResource(txt))
-            readFileScan(scan,data)
-        }else{
-            val temp = "$title.txt"
-            try {
-                val scan2 = Scanner(openFileInput(temp))
-                readFileScan(scan2,data)
-            }catch (e:Exception){
-            }
-        }
-        try{
-            val scan3 = Scanner(openFileInput("즐겨찾기.txt"))
-            readFileScan(scan3,stardata)
-        }catch (e:Exception){}
-
-    }
-
-    private fun initRecyclerView() {
-        recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false)
-        adapter = VocaAdapter(data, stardata)
-        adapter.itemClickListener = object :VocaAdapter.OnItemClickListener{
-            override fun OnItemClick(
-                    holder: VocaAdapter.ViewHolder,
-                    view: View,
-                    data: MyData,
-                    position: Int
-            ) {
-                if (isTtsReady)
-                    tts?.speak(data.word, TextToSpeech.QUEUE_ADD, null, null)
-            }
-        }
-        adapter.HeartClickListener = object :VocaAdapter.OnItemClickListener{
-            override fun OnItemClick(
-                    holder: VocaAdapter.ViewHolder,
-                    view: View,
-                    data: MyData,
-                    position: Int
-            ) {
-                var flag = false
-                if(title == "토익" || title == "토플") {
-                    flag = true
-                }
-                adapter.changeIsOpen(position, flag)
-                saveStar()
-                saveData()
-            }
-        }
-
-        recyclerView.adapter = adapter
-        val simpleCallBack = object:
-                ItemTouchHelper.SimpleCallback(ItemTouchHelper.DOWN or ItemTouchHelper.UP, ItemTouchHelper.RIGHT){
-            override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder
-            ): Boolean {
-                adapter.moveItem(viewHolder.adapterPosition, target.adapterPosition)
-                return true
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                adapter.removeItem(viewHolder.adapterPosition)
-                saveData()
-            }
-
-        }
-        val itemTouchHelper = ItemTouchHelper(simpleCallBack)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 
 }

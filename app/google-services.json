@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "760307069626",
+    "project_id": "hongca-a9031",
+    "storage_bucket": "hongca-a9031.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:760307069626:android:291c910a42c30f9d8f0883",
+        "android_client_info": {
+          "package_name": "com.example.hongca"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "760307069626-oj2rulcme0p6cc8r72p1kcoanj3ehkq7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEPdYAhJ8DSR4CAK9dPM-vSGAr_CVE788"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "760307069626-oj2rulcme0p6cc8r72p1kcoanj3ehkq7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

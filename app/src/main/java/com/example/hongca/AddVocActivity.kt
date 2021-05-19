@@ -7,11 +7,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.hongca.databinding.ActivityAddVocBinding
 import com.example.hongca.databinding.ActivityMainBinding
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import java.io.PrintStream
 
 class AddVocActivity : AppCompatActivity() {
     lateinit var binding: ActivityAddVocBinding
-    var txt:String = ""
+    lateinit var rdb: DatabaseReference
+    var noteTitle = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,9 +23,7 @@ class AddVocActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val i = intent
-        val title = i.getStringExtra("title").toString()
-        txt = "$title.txt"
-
+        noteTitle = i.getStringExtra("noteTitle").toString()
         init()
     }
 
@@ -30,18 +31,15 @@ class AddVocActivity : AppCompatActivity() {
         binding.addbtn.setOnClickListener {
             val word = binding.word.text.toString()
             val meaning = binding.mean.text.toString()
-            writeFile(word, meaning)
-        }
-    }
 
-    private fun writeFile(word: String, meaning: String) {
-        val output = PrintStream(openFileOutput(txt, Context.MODE_APPEND))
-        output.println(word)
-        output.println(meaning)
-        output.close()
-        val intent = Intent()
-        intent.putExtra("voc",MyData(word = word, meaning = meaning, star = "false"))
-        setResult(Activity.RESULT_OK, intent)
-        finish()
+            rdb = FirebaseDatabase.getInstance().getReference("MyApp/Note/${noteTitle}")
+            val item = MyData(word,meaning,"false", noteTitle)
+            rdb.child(item.word).setValue(item)
+
+            val intent = Intent()
+            intent.putExtra("voc",item)
+            setResult(Activity.RESULT_OK, intent)
+            finish()
+        }
     }
 }

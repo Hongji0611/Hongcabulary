@@ -3,15 +3,19 @@ package com.example.hongca
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.hongca.databinding.ActivityWriteTestBinding
+import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.google.firebase.database.*
 import java.util.*
 import kotlin.collections.ArrayList
 
 class WriteTestActivity : AppCompatActivity() {
     lateinit var binding: ActivityWriteTestBinding
-    var data:ArrayList<MyData> = ArrayList()
+    lateinit var rdb: DatabaseReference //문제 가져올 단어장
+
+    var wordList = ArrayList<MyData>()
     var viewList = ArrayList<WriteTestFragment>()
 
-    var title = ""
+    var noteTitle = ""
     var count = 0
     var type = 0
     var testName = ""
@@ -23,48 +27,17 @@ class WriteTestActivity : AppCompatActivity() {
         init()
     }
 
-    fun readFileScan(scan: Scanner){
-        while(scan.hasNextLine()){
-            val word = scan.nextLine()
-            val meaning = scan.nextLine()
-            val star = scan.nextLine()
-            data.add(MyData(word = word,meaning = meaning, star = star))
-        }
-        scan.close()
-    }
-
-    private fun initData(title: String, rawsourse: Int) {
-        if(rawsourse != 0) {
-            val scan = Scanner(resources.openRawResource(rawsourse))
-            readFileScan(scan)
-        }else{
-            val temp = "$title.txt"
-            try {
-                val scan2 = Scanner(openFileInput(temp))
-                readFileScan(scan2)
-            }catch (e:Exception){
-            }
-        }
-    }
-
     private fun init() {
+
         val i = intent
-        title = i.getStringExtra("title").toString()
+        noteTitle = i.getStringExtra("title").toString()
         count = i.getIntExtra("count",5)
         type = i.getIntExtra("type",0)
         testName = i.getStringExtra("testName").toString()
 
         binding.title.text = testName
 
-        when(title){
-            "즐겨찾기" -> initData("즐겨찾기", 0)
-            "토익" -> initData("toeic",R.raw.toeic)
-            "토플" -> initData("toefl",R.raw.toefl)
-            "나만의 단어장" -> initData("나만의 단어장",0)
-            "오답노트" -> initData("오답노트",0)
-        }
-
-        binding.noteTitle.text = title
+        binding.noteTitle.text = noteTitle
         binding.count.text = "$count 개"
         if(type == 0){
             binding.type.text = "뜻 맞추기"
@@ -72,26 +45,49 @@ class WriteTestActivity : AppCompatActivity() {
             binding.type.text = "영어 맞추기"
         }
 
-        if(data.size < count){
-            count = data.size
-        }
+        //데이터베이스 접근
+        rdb = FirebaseDatabase.getInstance().getReference("MyApp/Note/${noteTitle}")
+        val query = rdb.limitToLast(50)
+        val option = FirebaseRecyclerOptions.Builder<MyData>()
+                .setQuery(query, MyData::class.java)
+                .build()
 
-        //중복되지 않게 단어를 뽑음
-        val random = Random()
-        val numList =ArrayList<Int>(count)
-        while(numList.size<count){
-            val num = random.nextInt(data.size)
-            if(numList.contains(num)) continue
-            numList.add(num)
-        }
+        //어뎁터에 값 넣기
+        rdb.addListenerForSingleValueEvent(object:ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
 
-        for(i in 0 until count){
-            //뜻을 /를 기준으로 나눔
-            val temp = data[numList[i]].meaning.split("/")
-            val frag = WriteTestFragment(type, data[numList[i]], temp, testName)
-            viewList.add(frag)
-        }
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    for (snap in snapshot.children) {
+                        var data = snap.getValue(MyData::class.java)
+                        wordList.add(data!!)
+                    }
+                    if(wordList.size < count){
+                        count = wordList.size
+                    }
 
-        binding.viewPager.adapter = WriteTestAdapter(this, viewList)
+                    //중복되지 않게 단어를 뽑음
+                    val random = Random()
+                    val numList =ArrayList<Int>(count)
+                    while(numList.size<count){
+                        val num = random.nextInt(wordList.size)
+                        if(numList.contains(num)) continue
+                        numList.add(num)
+                    }
+
+                    for(i in 0 until count){
+                        //뜻을 /를 기준으로 나눔
+                        val temp = wordList[numList[i]].meaning.split("/")
+                        val frag = WriteTestFragment(type, wordList[numList[i]], temp, testName)
+                        viewList.add(frag)
+                    }
+
+                    binding.viewPager.adapter = WriteTestAdapter(this@WriteTestActivity, viewList)
+                }
+            }
+        })
+
     }
 }
