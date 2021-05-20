@@ -43,32 +43,24 @@ class AlarmFragment() : Fragment() {
                         mymin = dlgBinding.timePicker.minute
                         message = myhour.toString() + "시 "+mymin.toString()+"분: "+mymemo
 
-//                        val timerTask = object  : TimerTask(){
-//                            override fun run() {
-//                                makeNotification() //알림창 수행
-//
-//                            }
-//                        }
-
+                        //알람 시간 설정
                         val calendar = Calendar.getInstance()
                         calendar.timeInMillis = System.currentTimeMillis()
-                        calendar.set(year,month,dayOfMonth,myhour,mymin)
+                        calendar.set(year,month,dayOfMonth,myhour,mymin,0)
 
+                        //알람 Receiver 설정
+                        val intent = Intent(activity, AlarmReceiver::class.java)
+                        intent.putExtra("mymemo", mymemo)
+                        var pIntent = PendingIntent.getBroadcast(activity, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT)
 
-                        val intent = Intent(activity, AlarmReceiver::class.java).apply {
-                            action = "com.check.up.setAlarm"
-                        }
-
-                        val alarmMgr:AlarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                        val pendingIntent = PendingIntent.getBroadcast(activity, 0, intent, 0)
-                        alarmMgr!![AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis()] = pendingIntent
+                        //알람 메니저 설정
+                        var alarmManager = activity?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pIntent)
 
                         if(calendar.before(Calendar.getInstance())){
                             Toast.makeText(activity, "알림을 설정할 수 없습니다.",Toast.LENGTH_SHORT).show()
                         }
 
-//                        val timer = Timer()
-//                        timer.schedule(timerTask, 2000)
                         Toast.makeText(activity, "알림이 추가되었습니다",Toast.LENGTH_SHORT).show()
                     }
                     ?.setNegativeButton("취소"){

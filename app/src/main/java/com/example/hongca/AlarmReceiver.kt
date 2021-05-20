@@ -1,5 +1,6 @@
 package com.example.hongca
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -10,8 +11,9 @@ import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
 
-class AlarmReceiver: BroadcastReceiver() {
+class AlarmReceiver(): BroadcastReceiver() {
     lateinit var notificationManager: NotificationManager
+    var mymemo = ""
 
     companion object {
         const val TAG = "AlarmReceiver"
@@ -25,12 +27,19 @@ class AlarmReceiver: BroadcastReceiver() {
 
         createNotificationChannel()
         if (context != null) {
+            mymemo = intent?.getStringExtra("mymemo").toString()
             deliverNotification(context)
         }
-        val mServiceintent = Intent(context, AlarmService::class.java)
-        context?.startService(mServiceintent)
     }
     private fun deliverNotification(context: Context) {
+        val id = "myChannel"
+        val name = "TimeCheckChannel"
+        val notificationChannel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_DEFAULT)
+        notificationChannel.enableVibration(true)
+        notificationChannel.enableLights(true)
+        notificationChannel.lightColor = Color.BLUE
+        notificationChannel.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+
         val contentIntent = Intent(context, MainActivity::class.java)
         val contentPendingIntent = PendingIntent.getActivity(
                 context,
@@ -40,9 +49,9 @@ class AlarmReceiver: BroadcastReceiver() {
         )
         val builder =
                 NotificationCompat.Builder(context, PRIMARY_CHANNEL_ID)
-                        .setSmallIcon(R.drawable.logo2)
+                        .setSmallIcon(R.drawable.logo)
                         .setContentTitle("일정 알람")
-                        .setContentText("ㅁㄴㅇㄻㄴㅇㄻ")
+                        .setContentText(mymemo)
                         .setContentIntent(contentPendingIntent)
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setAutoCancel(true)

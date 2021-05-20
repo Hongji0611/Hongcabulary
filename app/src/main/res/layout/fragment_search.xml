@@ -24,7 +24,7 @@
                 android:background="@drawable/yellow_border"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:padding="10dp">
+                android:padding="15dp">
 
                 <EditText
                     android:id="@+id/editText"
@@ -33,7 +33,7 @@
                     android:layout_weight="5"
                     android:background="@null"
                     android:ems="15"
-                    android:hint="단어/뜻을 입력해주세요"
+                    android:hint="단어를 입력해주세요"
                     android:inputType="textPersonName"
                     android:textSize="14sp" />
 
@@ -58,37 +58,10 @@
                 android:textSize="20dp"
                 android:textStyle="bold" />
 
-            <LinearLayout
-                android:id="@+id/layout1"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView1"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/gray_bottom"
-                android:gravity="center|fill"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="30dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/voca1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|left"
-                    android:layout_weight="1"
-                    android:text="TextView"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/meaning1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical|right"
-                    android:text="TextView"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                android:layout_height="wrap_content"/>
 
             <TextView
                 android:id="@+id/toefl"
@@ -102,38 +75,10 @@
                 android:textSize="20dp"
                 android:textStyle="bold" />
 
-            <LinearLayout
-                android:id="@+id/layout2"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView2"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/gray_bottom"
-                android:gravity="center|fill"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="30dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/voca2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|left"
-                    android:layout_weight="1"
-                    android:text="TextView"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/meaning2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical|right"
-                    android:text="TextView"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
+                android:layout_height="wrap_content"/>
 
             <TextView
                 android:id="@+id/myown"
@@ -147,37 +92,10 @@
                 android:textSize="20dp"
                 android:textStyle="bold" />
 
-            <LinearLayout
-                android:id="@+id/layout3"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView3"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/gray_bottom"
-                android:gravity="center|fill"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="30dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/voca3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|left"
-                    android:layout_weight="1"
-                    android:text="TextView"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/meaning3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical|right"
-                    android:text="TextView"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                android:layout_height="wrap_content"/>
 
             <TextView
                 android:id="@+id/daum"

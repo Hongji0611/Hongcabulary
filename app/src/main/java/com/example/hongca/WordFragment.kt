@@ -62,12 +62,6 @@ class WordFragment : Fragment() {
         binding?.apply {
             recyclerView.layoutManager = layoutManager
             recyclerView.adapter = adapter
-            addNote.setOnClickListener {
-//                val intent = Intent(activity, VocaActivity::class.java)
-//                intent.putExtra("noteTitle", "즐겨찾기")
-//                startActivity(intent)
-            }
-
         }
 
         return binding!!.root
