@@ -12,7 +12,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
-    val textarr = arrayListOf<String>("단어장","퀴즈", "검색하기", "알림설정")
+    val textarr = arrayListOf<String>("단어장","퀴즈", "검색하기", "알람설정")
     val iconarr = arrayListOf<Int>(R.drawable.ic_baseline_menu_book_24, R.drawable.ic_baseline_done_outline_24, R.drawable.ic_baseline_search_24, R.drawable.ic_baseline_alarm_24)
     private var data = ArrayList<TitleData>()
 

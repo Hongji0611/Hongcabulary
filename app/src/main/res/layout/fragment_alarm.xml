@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:gravity="center"
-            android:text="나만의 알림을 설정해보세요!"
+            android:text="나만의 알람을 설정해보세요!"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -46,7 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="- 추가 버튼을 누르면 해당 알림이 설정됩니다."
+            android:text="- 추가 버튼을 누르면 해당 알람이 설정됩니다."
             android:textSize="14sp" />
     </LinearLayout>
 
