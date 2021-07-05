@@ -43,8 +43,8 @@
 
 ### 퀴즈
 ![image](https://user-images.githubusercontent.com/63103070/124433126-57f9c700-ddad-11eb-8148-f7e0831fe43c.png)
-![image](https://user-images.githubusercontent.com/63103070/124433191-6ea01e00-ddad-11eb-9e37-75e25f7f5569.png)![image](https://user-images.githubusercontent.com/63103070/124433161-63e58900-ddad-11eb-948f-79621668a76f.png)
-![image](https://user-images.githubusercontent.com/63103070/124433219-7790ef80-ddad-11eb-82a8-322ed95bf92e.png)
+![image](https://user-images.githubusercontent.com/63103070/124433191-6ea01e00-ddad-11eb-9e37-75e25f7f5569.png)
+![image](https://user-images.githubusercontent.com/63103070/124433161-63e58900-ddad-11eb-948f-79621668a76f.png)
 
 ### 검색하기
 ![image](https://user-images.githubusercontent.com/63103070/124433275-8677a200-ddad-11eb-91a6-15f2db1110b2.png)
